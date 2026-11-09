@@ -202,7 +202,7 @@ exports.run = async function run() {
 
   await check('REQ21: an eidos.path older than the carried eidos is not used', async () => {
     const fake = path.join(path.dirname(root), 'eidos-0.0.1');
-    fs.copyFileSync(path.join(extension.extensionPath, 'test', 'fixtures', 'fake-eidos.cjs'), fake);
+    fs.copyFileSync(path.join(__dirname, '..', 'fixtures', 'fake-eidos.cjs'), fake);
     fs.chmodSync(fake, 0o755);
     await vscode.workspace.getConfiguration('eidos').update('path', fake, vscode.ConfigurationTarget.Global);
     await new Promise((resolve) => setTimeout(resolve, 1500));

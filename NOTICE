@@ -1,0 +1,21 @@
+Eidos for VS Code
+Copyright 2026 The Virtual Panda
+
+The extension's own code, everything in this repository, is licensed under the
+MIT License (see LICENSE).
+
+Each platform's VSIX also carries the eidos CLI as a binary, bin/eidos (or
+bin/eidos.exe), fetched at packaging time from the CLI's release files
+(https://dl.eidosmd.com/cli/v<version>/) and checked against the SHA-256
+published beside each. That binary is not part of this repository and is not
+covered by the MIT License: it is The Virtual Panda's eidos CLI, licensed under
+the PolyForm Strict License 1.0.0 (https://polyformproject.org/licenses/strict/1.0.0)
+with an additional permission for any commercial purpose. It is free to use,
+personally or at work, as it is; it may not be changed, made the basis of new
+works, or redistributed. The Virtual Panda, its licensor, distributes it inside
+the extension's VSIX. The binary carries its own LICENSE and NOTICE, which also
+name the material from the Eidos standard it includes, Copyright 2026 Buildable,
+under the Apache License, Version 2.0.
+
+The version of eidos a VSIX carries is the one package.json names under
+"eidos": { "version" }.

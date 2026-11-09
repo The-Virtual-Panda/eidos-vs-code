@@ -24,7 +24,8 @@ const vscodeExecutablePath = process.env.VSCODE_PATH ?? (existsSync(macCode) ? m
 try {
   await runTests({
     vscodeExecutablePath,
-    extensionDevelopmentPath: path.resolve('.'),
+    // EIDOS_EXTENSION_PATH runs the checks on another build, an unpacked VSIX's extension/ folder
+    extensionDevelopmentPath: path.resolve(process.env.EIDOS_EXTENSION_PATH ?? '.'),
     extensionTestsPath: path.resolve('test/host/suite.cjs'),
     launchArgs: [project, '--disable-extensions', '--user-data-dir', userData, '--skip-welcome', '--skip-release-notes', '--disable-workspace-trust'],
     extensionTestsEnv: { EIDOS_TEST_PROJECT: project },
