@@ -96,3 +96,21 @@ test('finds who Assigned to me means', () => {
   assert.equal(whoAmI(users, null, { name: 'brenton unger ii', email: 'other@example.com' }), 'brenton');
   assert.equal(whoAmI(users, null, { name: 'Nobody', email: null }), null);
 });
+
+test("the board: a column per board column, a card per task the filters keep, and a done task past hide_done_days left off", async () => {
+  const { boardState } = await import('../src/core/board.ts');
+  const state = boardState({ project: 'p', index: new ProjectIndex(snapshot), failure: null, filter: emptyFilter(), busy: false, now: new Date('2026-11-09T12:00:00-03:00') });
+  assert.deepEqual(
+    state.columns.map((column) => [column.name, column.cards.map((card) => card.id)]),
+    [
+      ['To Do', ['T-E55']],
+      ['In Progress', ['T-B12.2']],
+      ['Done', []],
+    ],
+  );
+  const card = state.columns[1]?.cards[0];
+  assert.deepEqual(card?.assignees, [{ alias: 'brenton', initials: 'BU', name: 'Brenton Unger II' }]);
+  assert.deepEqual(card?.progress, { done: 1, total: 2 });
+  assert.equal(state.columns[0]?.cards[0]?.type, 'Bug');
+  assert.equal(state.open, 3);
+});

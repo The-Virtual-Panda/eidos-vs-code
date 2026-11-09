@@ -5,9 +5,9 @@
 // and its title with New Task, then the search, then the filters.
 import * as vscode from 'vscode';
 import path from 'node:path';
-import { boardColumns, boardTypes, checklistProgress, filterTasks, findBoard, hiddenAsDone, priorityColor, statusColor, themeColorFor } from '../core/model.ts';
-import type { BoardCard, BoardState, BoardToExtension } from '../webview/protocol.ts';
-import type { BacklogSettings, Task, User } from '../core/shapes.ts';
+import { boardColumns } from '../core/model.ts';
+import { boardState } from '../core/board.ts';
+import type { BoardState, BoardToExtension } from '../webview/protocol.ts';
 import type { EidosProject } from './project.ts';
 import type { Projects } from './projects.ts';
 import { webviewHtml, webviewOptions } from './webviewHtml.ts';
@@ -18,7 +18,6 @@ export class BoardPanel implements vscode.Disposable {
   private readonly project: EidosProject;
   private readonly disposables: vscode.Disposable[] = [];
   private busy = false;
-  private message: string | null = null;
 
   static show(project: EidosProject, projects: Projects, extensionUri: vscode.Uri): void {
     const existing = BoardPanel.open.get(project);
@@ -42,64 +41,7 @@ export class BoardPanel implements vscode.Disposable {
   }
 
   private state(): BoardState {
-    const index = this.project.index;
-    const filter = this.project.filter;
-    const empty: BoardState = {
-      project: this.project.name,
-      boards: [],
-      board: null,
-      title: 'Board',
-      open: 0,
-      columns: [],
-      search: filter.search,
-      filters: {
-        milestone: { value: null, options: [] },
-        assignee: { value: null, options: [] },
-        type: { value: null, options: [] },
-        priority: { value: null, options: [] },
-        assignedToMe: false,
-        canFilterMe: false,
-      },
-      busy: this.busy,
-      message: null,
-    };
-    if (!index) return { ...empty, message: this.project.failure ?? 'Reading the project…' };
-    const backlog = index.snapshot.backlog;
-    if (!backlog) return { ...empty, message: 'The Backlog plugin is off for this project.' };
-
-    const settings = backlog.settings;
-    const board = findBoard(settings, filter.board) ?? settings.boards[0] ?? null;
-    const boardName = board?.name ?? null;
-    const shown = filterTasks(settings, backlog.tasks, { ...filter, board: boardName }, index.snapshot.me);
-    const now = new Date();
-    const users = new Map(index.snapshot.users.map((user) => [user.alias, user]));
-    const types = new Map(settings.types.map((type) => [type.name, type]));
-
-    const columns = boardColumns(settings, boardName).map((column) => {
-      const statuses = new Set(column.statuses);
-      const cards = shown.filter((task) => statuses.has(task.status) && !hiddenAsDone(settings, task, now)).map((task) => card(task, users, types, settings));
-      return { name: column.name, statuses: column.statuses, color: statusColor(settings, column.statuses[0] ?? ''), cards };
-    });
-
-    const choices = (values: string[]) => values.map((value) => ({ value, label: value }));
-    const typeNames = boardTypes(settings, boardName);
-    return {
-      ...empty,
-      boards: settings.boards.map((candidate) => ({ value: candidate.name, label: candidate.title })),
-      board: boardName,
-      title: board?.title ?? 'Board',
-      open: shown.filter((task) => task.open).length,
-      columns,
-      filters: {
-        milestone: { value: filter.milestone, options: choices(settings.milestones.map((milestone) => milestone.name)) },
-        assignee: { value: filter.assignee, options: index.snapshot.users.map((user) => ({ value: user.alias, label: `@${user.alias}` })) },
-        type: { value: filter.type, options: typeNames.length > 1 ? typeNames.map((name) => ({ value: name, label: types.get(name)?.title ?? name })) : [] },
-        priority: { value: filter.priority, options: choices(settings.priorities) },
-        assignedToMe: filter.assignedToMe,
-        canFilterMe: index.snapshot.me !== null,
-      },
-      message: this.message,
-    };
+    return boardState({ project: this.project.name, index: this.project.index, failure: this.project.failure, filter: this.project.filter, busy: this.busy, now: new Date() });
   }
 
   private post(): void {
@@ -163,30 +105,4 @@ export class BoardPanel implements vscode.Disposable {
     for (const disposable of this.disposables) disposable.dispose();
     this.panel.dispose();
   }
-}
-
-function initials(user: User | undefined, alias: string): string {
-  const name = user?.name ?? alias;
-  const words = name.split(/\s+/).filter((word) => /^[\p{L}\p{N}]/u.test(word));
-  if (words.length >= 2) return `${words[0]?.[0] ?? ''}${words[1]?.[0] ?? ''}`.toUpperCase();
-  return name.slice(0, 2).toUpperCase();
-}
-
-function card(task: Task, users: Map<string, User>, types: Map<string, { title: string; color?: string }>, settings: BacklogSettings): BoardCard {
-  const progress = checklistProgress(task);
-  const type = types.get(task.type || 'default');
-  const showType = (task.type || 'default') !== 'default';
-  return {
-    id: task.id,
-    title: task.title,
-    type: showType ? (type?.title ?? task.type) : null,
-    typeColor: showType && type?.color ? themeColorFor(type.color) : null,
-    priority: task.priority,
-    priorityColor: task.priority ? priorityColor(settings, task.priority) : null,
-    assignees: task.assignee.map((alias) => ({ alias, initials: initials(users.get(alias), alias), name: users.get(alias)?.name ?? alias })),
-    progress: progress.total > 0 ? progress : null,
-    blueprints: task.blueprints.map((served) => served.title ?? served.id),
-    blocked: task.blocked ?? false,
-    done: settings.status_categories[task.status] === 'done',
-  };
 }

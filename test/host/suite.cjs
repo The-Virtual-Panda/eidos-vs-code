@@ -129,6 +129,37 @@ exports.run = async function run() {
     assert.match(fs.readFileSync(path.join(root, blueprint.path), 'utf8'), new RegExp(`^maturity: ${next}$`, 'm'));
   });
 
+  await check('REQ17: a write never lands over unsaved edits: refused unless the developer saves first', async () => {
+    const document = await vscode.workspace.openTextDocument(taskFile);
+    const editor = await vscode.window.showTextDocument(document);
+    await editor.edit((edit) => edit.insert(new vscode.Position(document.lineCount, 0), '\nAn unsaved line.\n'));
+    assert.equal(document.isDirty, true);
+    const ask = vscode.window.showWarningMessage;
+    const asked = [];
+    try {
+      vscode.window.showWarningMessage = async (message) => {
+        asked.push(message);
+        return undefined;
+      };
+      const refused = await project.write(['backlog', 'set', task.id, '--priority', 'high'], taskFile);
+      assert.equal(refused, false, 'the write is refused while the edits are unsaved');
+      assert.equal(document.isDirty, true);
+      assert.doesNotMatch(fs.readFileSync(taskFile, 'utf8'), /^priority: high$/m);
+      vscode.window.showWarningMessage = async (message, _options, save) => {
+        asked.push(message);
+        return save;
+      };
+      const written = await project.write(['backlog', 'set', task.id, '--priority', 'high'], taskFile);
+      assert.equal(written, true);
+      const text = fs.readFileSync(taskFile, 'utf8');
+      assert.match(text, /^priority: high$/m);
+      assert.match(text, /An unsaved line\./, 'the saved edit is kept beside the write');
+    } finally {
+      vscode.window.showWarningMessage = ask;
+    }
+    assert.equal(asked.length, 2);
+  });
+
   await check('REQ12: a change made outside VS Code shows without a reload', async () => {
     const binary = path.join(extension.extensionPath, 'bin', 'eidos');
     execFileSync(binary, ['--project', root, 'backlog', 'set', task.id, '--priority', 'low'], { env: { ...process.env, EIDOS_RUNS_AS: extension.packageJSON.eidos.version } });

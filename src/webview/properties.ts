@@ -197,15 +197,18 @@ function drawField(field: Field, busy: boolean): HTMLElement {
   input.dataset['field'] = field.name;
   input.value = initial;
   input.disabled = busy;
-  // a text field writes when it is left or Enter is pressed, never on each key
+  // a text field writes when it is left or Enter is pressed, never on each key, and a value once
+  let sent = initial;
   const commit = () => {
-    if (input.value === initial) return;
+    if (input.value === sent) return;
+    sent = input.value;
     set(input.value === '' ? null : input.value);
   };
   input.addEventListener('change', commit);
   onKey(input, (event) => {
     if (event.key === 'Enter' && !(input instanceof HTMLTextAreaElement && event.shiftKey)) {
       event.preventDefault();
+      commit();
       input.blur();
     }
     if (event.key === 'Escape') {

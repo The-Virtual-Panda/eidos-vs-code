@@ -81,6 +81,7 @@ textarea { resize: vertical; }
   white-space: nowrap;
 }
 
+.chip .link, .chip > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .chip.typed { border-color: var(--dot, var(--border)); }
 .chip.missing { border-style: dashed; color: var(--muted); }
 .chip.blocked { color: var(--vscode-errorForeground); border-color: var(--vscode-errorForeground); }

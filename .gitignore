@@ -8,3 +8,6 @@ bin/
 
 # VS Code's own download and profile for the Extension Development Host tests
 .vscode-test/
+
+# a local preview of the webviews, never committed
+.claude/
