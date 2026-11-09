@@ -9,5 +9,6 @@ The first build, against eidos 0.21.0, which each platform's VSIX carries.
 - In a task, a CodeLens to tick each open checklist line and to append a note.
 - `eidos check`'s findings in Problems, with the command a finding names as a quick fix.
 - Blueprint and task ids that hover and open anywhere in the workspace, a requirement label after a blueprint id opening at that requirement.
+- Open in Eidos, from Properties or the palette: the blueprint or task at its page in Eidos MD, by the app's `eidosmd://open?project=&to=` link (Eidos MD 0.22 and later; an older app opens the project at its start or not at all).
 - Go to Blueprint, Go to Task, and New Task.
 - `eidos.path` to run another eidos; one older than the carried one is not used, and a command whose `--json` does not read from it runs on the carried one.

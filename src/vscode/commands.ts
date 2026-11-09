@@ -6,6 +6,7 @@ import path from 'node:path';
 import { readBlueprintIds, readTask, readTaskIds } from '../core/shapes.ts';
 import { boardTypes, findBoard, statusColor } from '../core/model.ts';
 import { taskLayout } from '../core/text.ts';
+import { openLink } from '../core/links.ts';
 import type { Projects } from './projects.ts';
 import type { EidosProject } from './project.ts';
 import type { Notices } from './notices.ts';
@@ -281,18 +282,28 @@ async function runFix(projects: Projects, file: string, command: string): Promis
   await project.write(args, null);
 }
 
+// The desktop app's link (The Desktop App REQ25, from Eidos MD 0.22): it opens or reuses the project and goes to the
+// page; an app older than 0.22 opens the project at its start or not at all, and the extension never asks which it is
 async function openInEidos(projects: Projects, file?: string): Promise<void> {
   const target = file ?? vscode.window.activeTextEditor?.document.uri.fsPath;
   const found = target ? projects.entityAt(target) : undefined;
-  let name: string | undefined;
-  if (found?.entity.kind === 'blueprint') name = found.entity.blueprint.id;
-  else if (found?.entity.kind === 'task') name = found.entity.task.id;
-  // The desktop app's eidosmd:// link carries only a sign-in today, so it cannot name a project or a file (docs/gaps.md)
-  const copy = 'Copy Id';
-  let message = 'Eidos MD cannot be opened at a file yet: its eidosmd:// link carries only a sign-in, not a project or a file.';
-  if (name) message = `Eidos MD cannot be opened at ${name} yet: its eidosmd:// link carries only a sign-in, not a project or a file. Open the project in Eidos MD and go to ${name} there.`;
-  const answer = await vscode.window.showInformationMessage(message, ...(name ? [copy] : []));
-  if (answer === copy && name) await vscode.env.clipboard.writeText(name);
+  const project = found?.project ?? (await projects.pick('Open which project in Eidos MD?'));
+  if (!project) return;
+  const link = openLink(project.root, found?.entity ?? null);
+  const opened = await openExternalExactly(link);
+  if (opened) return;
+  const copy = 'Copy Link';
+  const answer = await vscode.window.showWarningMessage('Eidos: nothing opened the eidosmd:// link. Opening a project at a page needs Eidos MD 0.22 or later, installed on this machine.', copy);
+  if (answer === copy) await vscode.env.clipboard.writeText(link);
+}
+
+// The link as written reaches the OS only when the extension host is handed a string: a vscode.Uri is decoded and
+// sent on as encodeURI(uri.toString(true)), which turns a `&`, `+`, or `#` in the project's folder into another
+// query (VS Code's ExtHostWindow.openUri and OpenerService._resolveExternalUriOpenTarget keep a string unchanged).
+// @types/vscode declares only the Uri, so the string goes through this one widened signature.
+function openExternalExactly(link: string): Thenable<boolean> {
+  const openExternal = vscode.env.openExternal as (target: vscode.Uri | string) => Thenable<boolean>;
+  return openExternal(link);
 }
 
 async function filterBacklog(projects: Projects, given?: EidosProject): Promise<void> {

@@ -24,6 +24,8 @@ CLI.
 - **Problems**: `eidos check`'s findings on the files they name, refreshed on save.
 - **Ids**: `B-A45` or `T-W85` anywhere hovers with its title, summary, and status, and opens with Go to Definition
   or a ⌘-click; `B-A45 REQ6` opens at that requirement.
+- **Open in Eidos**: the blueprint or task open in the editor, at its page in Eidos MD (0.22 or later), by the
+  app's `eidosmd://open` link.
 - **Go to Blueprint**, **Go to Task**, and **New Task**, and every action as an `Eidos:` command.
 
 A write is never made over unsaved edits: the extension asks you to save the file first.

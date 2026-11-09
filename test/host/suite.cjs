@@ -200,6 +200,30 @@ exports.run = async function run() {
     project.setFilter({ search: '' });
   });
 
+  await check('REQ4: Open in Eidos hands VS Code the desktop app link to the page of the open blueprint and task', async () => {
+    const open = vscode.env.openExternal;
+    const handed = [];
+    try {
+      vscode.env.openExternal = async (target) => {
+        handed.push(typeof target === 'string' ? target : target.toString());
+        return true;
+      };
+      await vscode.commands.executeCommand('eidos.openInEidos', path.join(root, blueprint.path));
+      await vscode.commands.executeCommand('eidos.openInEidos', path.join(root, project.index.task(task.id).file));
+    } finally {
+      vscode.env.openExternal = open;
+    }
+    assert.equal(handed.length, 2);
+    const read = handed.map((link) => {
+      const url = new URL(link);
+      return [url.protocol, url.hostname, url.searchParams.get('project'), url.searchParams.get('to')];
+    });
+    const encoded = blueprint.path.split('/').map(encodeURIComponent).join('/');
+    assert.deepEqual(read[0], ['eidosmd:', 'open', project.root, `/b/${encoded}`]);
+    assert.deepEqual(read[1], ['eidosmd:', 'open', project.root, project.index.task(task.id).href]);
+    results.push(`  ${decodeURIComponent(handed[1])}`);
+  });
+
   await check('REQ21: an eidos.path older than the carried eidos is not used', async () => {
     const fake = path.join(path.dirname(root), 'eidos-0.0.1');
     fs.copyFileSync(path.join(__dirname, '..', 'fixtures', 'fake-eidos.cjs'), fake);

@@ -69,6 +69,8 @@ export interface Task {
   name: string;
   aliases: string[];
   file: string;
+  // the task's page in the Eidos MD app, `/p/backlog/tasks/<name>`
+  href?: string;
   title: string;
   type: string;
   board: string | null;

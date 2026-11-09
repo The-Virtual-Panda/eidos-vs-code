@@ -4,13 +4,17 @@ What the extension could not do as its spec (B-A45) asks with what the `eidos` C
 stands in for each. The extension uses only the CLI's `--json` and the commands a person would run, so each gap
 is closed in the CLI or the desktop app, never by reaching past them.
 
-## Open in Eidos (REQ4)
+## Open in Eidos (REQ4): closed by Eidos MD 0.22
 
-The desktop app's `eidosmd://` link carries only a sign-in today, so it cannot name a project or a file to open
-([The Desktop App](https://github.com/The-Virtual-Panda/eidosmd), B-A45's dependency). **Open in Eidos** says so
-in a message that names the blueprint or task, and offers to copy its id; it neither starts the app nor guesses a
-link. Once the link carries a project and a file, the button opens it there (and starts the app when it is not
-running) without any other change to the extension.
+**Open in Eidos** opens the desktop app's link, `eidosmd://open?project=<folder>&to=<route>` (The Desktop App
+REQ25), which opens or reuses the project and goes to the page through the page's router, so a view holding
+unsaved work still asks. A blueprint's page is `/b/<its path>`, each segment encoded; a task's is the `href`
+`eidos backlog --json` prints. The link is handed to VS Code as a string, which reaches the OS unchanged; a
+`vscode.Uri` would be re-encoded on the way and break a project folder holding `&`, `+`, or `#`.
+
+The link ships in Eidos MD 0.22. An older app, or none, opens the project at its start or nothing at all, and
+the extension does not ask which version is installed; when nothing takes the link it says that opening at a page
+needs Eidos MD 0.22 and offers to copy the link. Whether the app starts when it is not running is the app's.
 
 ## A finding's fix (REQ9)
 
