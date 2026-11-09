@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.log
+*.vsix
+
+# the eidos binary each platform's VSIX carries, fetched from the CLI's release files, never committed
+bin/
+
+# VS Code's own download and profile for the Extension Development Host tests
+.vscode-test/

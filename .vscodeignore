@@ -1,0 +1,12 @@
+**
+!dist/extension.cjs
+!dist/webview/**
+!media/**
+!bin/eidos
+!bin/eidos.exe
+!bin/VERSION
+!LICENSE
+!NOTICE
+!README.md
+!CHANGELOG.md
+!package.json

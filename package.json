@@ -1,0 +1,146 @@
+{
+  "name": "eidos-vs-code",
+  "displayName": "Eidos",
+  "description": "The developer's workflow with Eidos in VS Code: specs and tasks in a sidebar, a Properties panel for their frontmatter, a board, check findings in Problems, and ids that hover and open.",
+  "version": "0.1.0",
+  "publisher": "the-virtual-panda",
+  "license": "SEE LICENSE IN LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/The-Virtual-Panda/eidos-vs-code.git"
+  },
+  "eidos": {
+    "version": "0.21.0"
+  },
+  "engines": {
+    "vscode": "^1.95.0",
+    "node": ">=22.6"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "eidos",
+    "specs",
+    "backlog",
+    "kanban"
+  ],
+  "extensionKind": [
+    "workspace"
+  ],
+  "type": "module",
+  "main": "./dist/extension.cjs",
+  "activationEvents": [
+    "workspaceContains:**/.eidos/Framework.yaml",
+    "workspaceContains:**/.eidos/Framework.yml",
+    "workspaceContains:**/.eidos/Framework.json"
+  ],
+  "contributes": {
+    "configuration": {
+      "title": "Eidos",
+      "properties": {
+        "eidos.path": {
+          "type": "string",
+          "default": "",
+          "scope": "machine-overridable",
+          "markdownDescription": "Another `eidos` to run instead of the one the extension carries: a newer build, or one being developed. Empty runs the one the extension carries. One older than the extension's own is not used."
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "eidos",
+          "title": "Eidos",
+          "icon": "media/eidos.svg"
+        }
+      ]
+    },
+    "views": {
+      "eidos": [
+        {
+          "id": "eidos.properties",
+          "name": "Properties",
+          "type": "webview",
+          "when": "eidos.active"
+        },
+        {
+          "id": "eidos.core",
+          "name": "Core",
+          "when": "eidos.active"
+        },
+        {
+          "id": "eidos.backlog",
+          "name": "Backlog",
+          "when": "eidos.active"
+        }
+      ]
+    },
+    "commands": [
+      { "command": "eidos.goToBlueprint", "title": "Go to Blueprint…", "category": "Eidos" },
+      { "command": "eidos.goToTask", "title": "Go to Task…", "category": "Eidos" },
+      { "command": "eidos.openBoard", "title": "Open Board", "category": "Eidos", "icon": "$(project)" },
+      { "command": "eidos.newTask", "title": "New Task…", "category": "Eidos", "icon": "$(add)" },
+      { "command": "eidos.tickChecklistLine", "title": "Tick Checklist Line…", "category": "Eidos" },
+      { "command": "eidos.appendNote", "title": "Append Note…", "category": "Eidos" },
+      { "command": "eidos.runCheck", "title": "Run Check", "category": "Eidos" },
+      { "command": "eidos.openInEidos", "title": "Open in Eidos", "category": "Eidos" },
+      { "command": "eidos.refresh", "title": "Refresh", "category": "Eidos", "icon": "$(refresh)" },
+      { "command": "eidos.filterBacklog", "title": "Filter Backlog…", "category": "Eidos", "icon": "$(filter)" },
+      { "command": "eidos.searchBacklog", "title": "Search Backlog…", "category": "Eidos", "icon": "$(search)" },
+      { "command": "eidos.toggleAssignedToMe", "title": "Toggle Assigned to Me", "category": "Eidos", "icon": "$(account)" },
+      { "command": "eidos.clearBacklogFilters", "title": "Clear Backlog Filters", "category": "Eidos", "icon": "$(clear-all)" },
+      { "command": "eidos.showEidosOutput", "title": "Show Output", "category": "Eidos" }
+    ],
+    "menus": {
+      "view/title": [
+        { "command": "eidos.newTask", "when": "view == eidos.backlog", "group": "navigation@1" },
+        { "command": "eidos.searchBacklog", "when": "view == eidos.backlog", "group": "navigation@2" },
+        { "command": "eidos.filterBacklog", "when": "view == eidos.backlog", "group": "navigation@3" },
+        { "command": "eidos.openBoard", "when": "view == eidos.backlog", "group": "navigation@4" },
+        { "command": "eidos.toggleAssignedToMe", "when": "view == eidos.backlog", "group": "filters@1" },
+        { "command": "eidos.clearBacklogFilters", "when": "view == eidos.backlog", "group": "filters@2" },
+        { "command": "eidos.refresh", "when": "view == eidos.core", "group": "navigation@1" }
+      ],
+      "commandPalette": [
+        { "command": "eidos.goToBlueprint", "when": "eidos.active" },
+        { "command": "eidos.goToTask", "when": "eidos.active" },
+        { "command": "eidos.openBoard", "when": "eidos.active" },
+        { "command": "eidos.newTask", "when": "eidos.active" },
+        { "command": "eidos.tickChecklistLine", "when": "eidos.active" },
+        { "command": "eidos.appendNote", "when": "eidos.active" },
+        { "command": "eidos.runCheck", "when": "eidos.active" },
+        { "command": "eidos.openInEidos", "when": "eidos.active" },
+        { "command": "eidos.refresh", "when": "eidos.active" },
+        { "command": "eidos.filterBacklog", "when": "eidos.active" },
+        { "command": "eidos.searchBacklog", "when": "eidos.active" },
+        { "command": "eidos.toggleAssignedToMe", "when": "eidos.active" },
+        { "command": "eidos.clearBacklogFilters", "when": "eidos.active" }
+      ]
+    },
+    "colors": [
+      {
+        "id": "eidos.accent",
+        "description": "Eidos's accent, on what is Eidos's own: an id, the activity, Open in Eidos.",
+        "defaults": { "dark": "#e08a63", "light": "#b4532a", "highContrast": "#f0a683", "highContrastLight": "#8f3f1d" }
+      }
+    ]
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/build.mjs --watch",
+    "check": "tsc --noEmit -p tsconfig.json",
+    "test": "node --test --experimental-strip-types \"test/*.test.ts\"",
+    "test:host": "node scripts/build.mjs && node test/host/run.mjs",
+    "fetch-eidos": "node scripts/fetch-eidos.mjs",
+    "package": "node scripts/package.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.1",
+    "@types/vscode": "1.95.0",
+    "@vscode/test-electron": "3.1.0",
+    "@vscode/vsce": "3.9.2",
+    "esbuild": "0.28.2",
+    "typescript": "5.9.3"
+  }
+}

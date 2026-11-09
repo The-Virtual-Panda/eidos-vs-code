@@ -1,0 +1,5 @@
+allowBuilds:
+  esbuild: true
+  # vsce's signing and credential store are for publishing to the Marketplace, never for building a VSIX
+  '@vscode/vsce-sign': false
+  keytar: false
