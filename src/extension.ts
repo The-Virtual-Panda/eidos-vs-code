@@ -15,7 +15,8 @@ import { registerCommands } from './vscode/commands.ts';
 // Where an id may be written: code, a comment, a commit message (REQ10)
 const anywhere: vscode.DocumentSelector = [{ scheme: 'file' }, { scheme: 'untitled' }, { scheme: 'vscode-scm' }, { scheme: 'git' }];
 
-export async function activate(context: vscode.ExtensionContext): Promise<void> {
+// The projects are handed back only to the Extension Development Host's tests (test/host)
+export async function activate(context: vscode.ExtensionContext): Promise<{ projects: Projects } | undefined> {
   const started = Date.now();
   const notices = new Notices();
   context.subscriptions.push(notices);
@@ -66,6 +67,8 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   await Promise.all(projects.all.map((project) => project.read()));
   notices.log(`ready in ${Date.now() - started} ms: ${projects.all.map((project) => project.root).join(', ') || 'no Eidos project'} on eidos ${cli.active?.version ?? 'none'} (${cli.active?.source ?? '-'})`);
   for (const project of projects.all) project.scheduleCheck(0);
+  if (context.extensionMode === vscode.ExtensionMode.Test) return { projects };
+  return undefined;
 }
 
 // The eidos this VSIX carries, at the version package.json names; a development build without one runs the eidos on the PATH

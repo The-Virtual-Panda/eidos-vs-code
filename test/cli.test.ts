@@ -36,6 +36,7 @@ function host() {
 test('names a command by its words before its arguments', () => {
   assert.equal(commandName(['backlog', 'set', 'T-A00', '--status', 'Done']), 'backlog set');
   assert.equal(commandName(['list', '--project', '/x']), 'list');
+  assert.equal(commandName(['--project', '/x', 'backlog', 'check', 'T-A00', '5']), 'backlog check');
   assert.equal(commandName(['property', 'set', '@B-A45', 'maturity', 'Mature']), 'property set');
 });
 

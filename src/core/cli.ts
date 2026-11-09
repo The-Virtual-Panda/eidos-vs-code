@@ -59,7 +59,9 @@ export function firstLine(text: string): string {
 // The command a notice names: its words before the first option or argument, `backlog set`, `check`
 export function commandName(args: string[]): string {
   const words: string[] = [];
-  for (const arg of args) {
+  let rest = args;
+  while (rest[0] === '--project' || rest[0] === '--root') rest = rest.slice(2);
+  for (const arg of rest) {
     if (arg.startsWith('-') || arg.startsWith('@') || /[A-Z/.]/.test(arg) || words.length === 2) break;
     words.push(arg);
   }

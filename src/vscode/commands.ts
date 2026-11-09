@@ -135,16 +135,17 @@ async function goTo(projects: Projects, what: 'blueprints' | 'tasks'): Promise<v
       const ask = ++asked;
       pick.busy = true;
       try {
-        const root = ['--project', project.root, '--search', words];
+        const root = ['--project', project.root];
+        const search = ['--search', words];
         const options = { cwd: project.root };
         const items: GoItem[] = [];
         if (what === 'tasks') {
-          const [taskIds, blueprintIds] = await Promise.all([project.cliJson(['backlog', ...root], readTaskIds, options), project.cliJson(['list', ...root], readBlueprintIds, options)]);
+          const [taskIds, blueprintIds] = await Promise.all([project.cliJson([...root, 'backlog', ...search], readTaskIds, options), project.cliJson([...root, 'list', ...search], readBlueprintIds, options)]);
           items.push(...taskIds.map(taskItem).filter((item): item is GoItem => item !== null));
           const blueprints = blueprintIds.map(blueprintItem).filter((item): item is GoItem => item !== null);
           if (blueprints.length > 0) items.push({ label: 'blueprints', kind: vscode.QuickPickItemKind.Separator }, ...blueprints);
         } else {
-          const ids = await project.cliJson(['list', ...root], readBlueprintIds, options);
+          const ids = await project.cliJson([...root, 'list', ...search], readBlueprintIds, options);
           items.push(...ids.map(blueprintItem).filter((item): item is GoItem => item !== null));
         }
         if (ask === asked) pick.items = items;
