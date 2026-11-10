@@ -32,12 +32,26 @@ function firstTaskWithOpenLine(index) {
   return index.snapshot.backlog.tasks.find((task) => task.open && task.sections.some((section) => section.type === 'checklist' && section.items.some((item) => !item.done)));
 }
 
+// The checks write (tick lines, set statuses, add a task), so they run only on run.mjs's scratch copy: the
+// project and every folder open in the host must sit in a fresh eidos-host- folder in the temp directory.
+function assertScratch(folder) {
+  const scratch = path.dirname(fs.realpathSync(folder));
+  const temp = fs.realpathSync(require('node:os').tmpdir());
+  if (path.dirname(scratch) !== temp || !path.basename(scratch).startsWith('eidos-host-')) {
+    throw new Error(`refusing to run the checks on ${folder}: they write, and run only on a scratch copy in ${temp}/eidos-host-*`);
+  }
+}
+
 exports.run = async function run() {
+  assert.ok(root, 'EIDOS_TEST_PROJECT names the scratch project');
+  assertScratch(root);
+  for (const folder of vscode.workspace.workspaceFolders ?? []) assertScratch(folder.uri.fsPath);
   const extension = vscode.extensions.all.find((candidate) => candidate.packageJSON.name === 'eidos');
   assert.ok(extension, 'the extension is installed in the host');
   const activated = Date.now();
   const api = await extension.activate();
   const project = api.projects.all[0];
+  for (const each of api.projects.all) assertScratch(each.root);
 
   await check('REQ1: turns on in the folder holding the project and finds one project', async () => {
     assert.equal(api.projects.all.length, 1);
