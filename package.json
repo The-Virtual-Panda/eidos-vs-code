@@ -10,7 +10,7 @@
     "url": "git+https://github.com/The-Virtual-Panda/eidos-vs-code.git"
   },
   "eidos": {
-    "version": "0.21.0"
+    "version": "0.22.0"
   },
   "engines": {
     "vscode": "^1.95.0",
