@@ -5,6 +5,8 @@ say what to build in a sidebar, edited in VS Code's own markdown editor with a P
 board of the backlog, `eidos check`'s findings in Problems, and blueprint and task ids that hover and open
 anywhere in the workspace.
 
+![A spec open in VS Code's markdown editor, its frontmatter as a form in Properties, the Core and the Backlog beneath](media/screenshots/sidebar.png)
+
 It turns on in a workspace folder holding an Eidos project (a `.eidos/` folder at the folder or beneath it), and
 it stands where any outside tool could: every read is a command of the `eidos` CLI run with `--json`, and every
 write is the command a person would run, so a project changed from VS Code is the same as one changed in Eidos
@@ -30,6 +32,24 @@ CLI.
 
 A write is never made over unsaved edits: the extension asks you to save the file first.
 
+**A task**, with its status, priority, and checklist in Properties and a CodeLens to tick the next line:
+
+![A task open with Properties showing its title, type, status, and priority, and Tick #3 over the open checklist line](media/screenshots/task.png)
+
+**The board**, a column per status, filtered as the Backlog view is:
+
+![The board in an editor tab: To Do, In Progress, In Review, and Done, each card with its id, type, priority, and blueprint](media/screenshots/board.png)
+
+**An id in code** hovers with the blueprint's title, summary, status, and the requirement it names:
+
+![A comment naming B-V63 REQ2 in a TypeScript file, hovering with Resume Playback, its summary, and In Progress](media/screenshots/hover.png)
+
+**`eidos check`** in Problems, on the files each finding names:
+
+![The Problems panel listing eidos check findings under each file, with the spec they name open above](media/screenshots/problems.png)
+
+The pictures show Reelhouse, a made-up streaming product.
+
 ## Which eidos it runs
 
 Each platform's VSIX carries its own `eidos` binary, the version `package.json` names under `eidos.version`, and
@@ -48,6 +68,7 @@ pnpm check              # TypeScript
 pnpm test               # unit tests
 pnpm test:host <path to an Eidos project>   # the Extension Development Host checks, on a copy of the project
 pnpm package [target]   # a VSIX for a platform (darwin-arm64, linux-x64, win32-x64, …, or all)
+node scripts/screenshots/run.mjs <project>  # the poses the README's pictures show, for capturing them again
 ```
 
 Without `bin/eidos`, a development build runs the `eidos` on the PATH. Press F5 with the repository open to run it

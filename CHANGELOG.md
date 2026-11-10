@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.1
+
+- The README, and so the extension's listing, shows what it looks like: a spec with Properties, a task, the board, an id hovering in code, and `eidos check` in Problems.
+
 ## 0.1.0
 
 The first build, against eidos 0.22.0, which each platform's VSIX carries.

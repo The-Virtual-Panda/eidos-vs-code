@@ -2,6 +2,7 @@
 !dist/extension.cjs
 !dist/webview/**
 !media/**
+media/screenshots/**
 !bin/eidos
 !bin/eidos.exe
 !bin/VERSION
