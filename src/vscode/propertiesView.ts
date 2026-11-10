@@ -60,7 +60,7 @@ export class PropertiesView implements vscode.WebviewViewProvider, vscode.Dispos
     const found = this.current();
     if (!found) {
       const project = this.projects.forFile(this.file);
-      if (project && !project.index) return { kind: 'empty', text: project.failure ?? 'Reading the project…' };
+      if (project && !project.index) return { kind: 'empty', text: project.failure ?? this.projects.cli.problem ?? 'Reading the project…' };
       return { kind: 'empty', text: `${path.basename(this.file)} is not an Eidos file. Open a blueprint or a task to edit its properties here.` };
     }
     const index = found.project.index;

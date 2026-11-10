@@ -1,8 +1,8 @@
 {
   "name": "eidos",
-  "displayName": "Eidos",
+  "displayName": "Eidos MD",
   "description": "The developer's workflow with Eidos in VS Code: specs and tasks in a sidebar, a Properties panel for their frontmatter, a board, check findings in Problems, and ids that hover and open.",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "publisher": "the-virtual-panda",
   "license": "SEE LICENSE IN LICENSE",
   "icon": "media/icon.png",
@@ -15,7 +15,7 @@
     "url": "git+https://github.com/The-Virtual-Panda/eidos-vs-code.git"
   },
   "eidos": {
-    "version": "0.22.0"
+    "minimum": "0.22.0"
   },
   "engines": {
     "vscode": "^1.95.0",
@@ -48,10 +48,27 @@
           "type": "string",
           "default": "",
           "scope": "machine-overridable",
-          "markdownDescription": "Another `eidos` to run instead of the one the extension carries: a newer build, or one being developed. Empty runs the one the extension carries. One older than the extension's own is not used."
+          "markdownDescription": "The `eidos` to run, when it is not the one on the PATH or where the install script put it: a build installed elsewhere, or one being developed. Empty finds the installed one. One older than the version this extension reads is not used."
         }
       }
     },
+    "viewsWelcome": [
+      {
+        "view": "eidos.core",
+        "contents": "The Eidos CLI is not installed. The extension reads and writes the project through it.\n[Install the Eidos CLI](command:eidos.installCli)\nInstalled somewhere else? Point [Eidos: Path](command:workbench.action.openSettings?%5B%22eidos.path%22%5D) at it.",
+        "when": "eidos.cli == missing"
+      },
+      {
+        "view": "eidos.core",
+        "contents": "The eidos installed here is older than this extension reads.\n[Update eidos](command:eidos.updateCli)",
+        "when": "eidos.cli == outdated"
+      }
+    ],
+    "taskDefinitions": [
+      {
+        "type": "eidos"
+      }
+    ],
     "viewsContainers": {
       "activitybar": [
         {
@@ -95,7 +112,9 @@
       { "command": "eidos.searchBacklog", "title": "Search Backlog…", "category": "Eidos", "icon": "$(search)" },
       { "command": "eidos.toggleAssignedToMe", "title": "Toggle Assigned to Me", "category": "Eidos", "icon": "$(account)" },
       { "command": "eidos.clearBacklogFilters", "title": "Clear Backlog Filters", "category": "Eidos", "icon": "$(clear-all)" },
-      { "command": "eidos.showEidosOutput", "title": "Show Output", "category": "Eidos" }
+      { "command": "eidos.showEidosOutput", "title": "Show Output", "category": "Eidos" },
+      { "command": "eidos.installCli", "title": "Install the Eidos CLI", "category": "Eidos" },
+      { "command": "eidos.updateCli", "title": "Update eidos", "category": "Eidos" }
     ],
     "menus": {
       "view/title": [
@@ -120,7 +139,9 @@
         { "command": "eidos.filterBacklog", "when": "eidos.active" },
         { "command": "eidos.searchBacklog", "when": "eidos.active" },
         { "command": "eidos.toggleAssignedToMe", "when": "eidos.active" },
-        { "command": "eidos.clearBacklogFilters", "when": "eidos.active" }
+        { "command": "eidos.clearBacklogFilters", "when": "eidos.active" },
+        { "command": "eidos.installCli", "when": "eidos.cli == missing" },
+        { "command": "eidos.updateCli", "when": "eidos.cli == outdated" }
       ]
     },
     "colors": [
@@ -137,7 +158,6 @@
     "check": "tsc --noEmit -p tsconfig.json",
     "test": "node --test --experimental-strip-types \"test/*.test.ts\"",
     "test:host": "node scripts/build.mjs && node test/host/run.mjs",
-    "fetch-eidos": "node scripts/fetch-eidos.mjs",
     "package": "node scripts/package.mjs"
   },
   "devDependencies": {

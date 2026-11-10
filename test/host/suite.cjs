@@ -185,9 +185,8 @@ exports.run = async function run() {
   });
 
   await check('REQ12: a change made outside VS Code shows without a reload', async () => {
-    const binary = path.join(extension.extensionPath, 'bin', 'eidos');
     const priority = anotherPriority();
-    execFileSync(binary, ['--project', root, 'backlog', 'set', task.id, '--priority', priority], { env: { ...process.env, EIDOS_RUNS_AS: extension.packageJSON.eidos.version } });
+    execFileSync(api.projects.cli.binary.path, ['--project', root, 'backlog', 'set', task.id, '--priority', priority], { cwd: root });
     await until('the index to see the new priority', () => String(project.index.task(task.id).priority).toLowerCase() === priority.toLowerCase());
   });
 
@@ -249,12 +248,14 @@ exports.run = async function run() {
     results.push(`  ${decodeURIComponent(handed[1])}`);
   });
 
-  await check('REQ21: an eidos.path older than the carried eidos is not used', async () => {
+  await check('REQ21: an eidos.path older than the extension reads is not used', async () => {
     const fake = path.join(path.dirname(root), 'eidos-0.0.1');
     fs.copyFileSync(path.join(__dirname, '..', 'fixtures', 'fake-eidos.cjs'), fake);
     fs.chmodSync(fake, 0o755);
     await vscode.workspace.getConfiguration('eidos').update('path', fake, vscode.ConfigurationTarget.Global);
     await new Promise((resolve) => setTimeout(resolve, 1500));
+    assert.equal(api.projects.cli.status, 'ready', 'the installed eidos runs instead');
+    assert.notEqual(api.projects.cli.binary.path, fake);
     await vscode.workspace.getConfiguration('eidos').update('path', undefined, vscode.ConfigurationTarget.Global);
     assert.ok(project.index, 'the project still reads');
   });

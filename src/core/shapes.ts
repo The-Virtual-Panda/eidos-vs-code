@@ -1,6 +1,6 @@
 // The parts of the eidos CLI's --json the extension reads, and a reader per
 // command that says whether an output has them (REQ21: an output that does
-// not read as expected sends that command to the bundled eidos). A reader
+// not read as expected fails with the version the extension reads). A reader
 // checks only what the extension uses, so a field the CLI adds never trips it.
 
 export interface PropertyDeclaration {

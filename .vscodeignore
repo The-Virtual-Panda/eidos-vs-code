@@ -3,11 +3,7 @@
 !dist/webview/**
 !media/*.svg
 !media/icon.png
-!bin/eidos
-!bin/eidos.exe
-!bin/VERSION
 !LICENSE
-!NOTICE
 !README.md
 !CHANGELOG.md
 !package.json

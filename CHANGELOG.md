@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.2.0
+
+The extension now runs the `eidos` you installed instead of carrying its own, so it is one small package for every platform.
+
+- It finds `eidos` on the PATH, or where the install script puts it, and needs 0.22 or later.
+- With no `eidos` installed, the Eidos sidebar offers Install the Eidos CLI, which runs the CLI's install command in a terminal. With an older one, it offers Update eidos, which runs `eidos version update`.
+- In a project, `eidos` runs as the version the project pins, as it does in a terminal. A pin older than the extension reads runs as the installed `eidos`, said once.
+- `eidos.path` names an `eidos` installed elsewhere; one older than the extension reads is passed over for the installed one.
+- A command whose `--json` does not read as expected fails naming the version the extension reads, instead of running again on a carried build.
+- The listing's name is Eidos MD.
+
 ## 0.1.1
 
 - The README, and so the extension's listing, shows what it looks like: a spec with Properties, a task, the board, an id hovering in code, and `eidos check` in Problems.

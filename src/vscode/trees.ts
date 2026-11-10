@@ -33,6 +33,8 @@ export class CoreTree implements vscode.TreeDataProvider<CoreNode> {
 
   getChildren(node?: CoreNode): CoreNode[] {
     if (!node) {
+      // empty, so the view's welcome says how to get an eidos (package.json viewsWelcome)
+      if (this.projects.cli.status !== 'ready') return [];
       if (this.projects.all.length === 1 && this.projects.all[0]) return this.projectChildren(this.projects.all[0]);
       return this.projects.all.map((project) => ({ kind: 'project', project }));
     }
@@ -134,6 +136,7 @@ export class BacklogTree implements vscode.TreeDataProvider<BacklogNode> {
 
   getChildren(node?: BacklogNode): BacklogNode[] {
     if (!node) {
+      if (this.projects.cli.status !== 'ready') return [];
       if (this.projects.all.length === 1 && this.projects.all[0]) return this.projectChildren(this.projects.all[0]);
       return this.projects.all.map((project) => ({ kind: 'project', project }));
     }

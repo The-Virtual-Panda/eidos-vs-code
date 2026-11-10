@@ -1,6 +1,6 @@
 # A release is a version tag. Pushing v<version> (the version package.json names) tests the extension, packages
-# the seven platform VSIX files, attaches them to the tag's GitHub release, and publishes them to Open VSX and,
-# once the publisher is accepted there, to the VS Code Marketplace.
+# its one VSIX (it carries no eidos, so every platform takes the same file), attaches it to the tag's GitHub
+# release, and publishes it to Open VSX and, once the publisher is accepted there, to the VS Code Marketplace.
 #
 # Open VSX takes the workflow's own OIDC identity (trusted publishing), so it needs no stored token: the
 # the-virtual-panda namespace registers this repository, this file, and the open-vsx environment. The
@@ -57,13 +57,17 @@ jobs:
       - run: pnpm check
       - run: pnpm test
 
-      - name: Extension Development Host checks
+      # the checks run the oldest eidos the extension reads, installed as a person would install it
+      - name: Install eidos
         run: |
-          pnpm fetch-eidos linux-x64
-          xvfb-run -a pnpm test:host test/host/project
+          curl -fsSL https://eidosmd.com/install | EIDOS_VERSION="$(node -p "require('./package.json').eidos.minimum")" sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
-      - name: Package every platform
-        run: pnpm package all
+      - name: Extension Development Host checks
+        run: xvfb-run -a pnpm test:host test/host/project
+
+      - name: Package
+        run: pnpm package
 
       - uses: actions/upload-artifact@v7
         with:

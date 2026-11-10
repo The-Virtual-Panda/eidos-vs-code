@@ -12,7 +12,7 @@ const skipped = '{**/node_modules/**,**/.git/**}';
 
 export class Projects implements vscode.Disposable {
   all: EidosProject[] = [];
-  private readonly cli: EidosCli;
+  readonly cli: EidosCli;
   private readonly notices: Notices;
   private readonly changedProjects = new vscode.EventEmitter<void>();
   private readonly changedAny = new vscode.EventEmitter<EidosProject>();
@@ -54,6 +54,11 @@ export class Projects implements vscode.Disposable {
     }
     this.all.sort((left, right) => left.name.localeCompare(right.name));
     await vscode.commands.executeCommand('setContext', 'eidos.active', this.all.length > 0);
+    this.changedProjects.fire();
+  }
+
+  // Redraws every view, after the eidos the extension runs changed
+  refresh(): void {
     this.changedProjects.fire();
   }
 

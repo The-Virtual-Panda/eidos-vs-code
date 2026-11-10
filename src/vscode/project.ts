@@ -91,6 +91,8 @@ export class EidosProject implements vscode.Disposable {
   // and one the last read already saw is not read again
   private async fileChanged(uri: vscode.Uri): Promise<void> {
     if (ownWrites.some((pattern) => pattern.test(uri.fsPath))) return;
+    // the project's pin (eidos version pin) may name another version to run here
+    if (uri.fsPath === path.join(this.root, '.eidos', 'plugins', 'eidosmd', 'cli.yaml')) this.cli.forgetProject(this.root);
     if (this.writing > 0) return;
     const modified = await stat(uri.fsPath)
       .then((stats) => stats.mtimeMs)
@@ -132,6 +134,8 @@ export class EidosProject implements vscode.Disposable {
   // Reads the parts asked for, each by its command, all at once. One asked for while a read runs is made after
   // it, and the caller's promise settles only once a read that began after the ask is done.
   read(parts: Part[] = allParts): Promise<void> {
+    // nothing is read without an eidos to read it; finding one reads every project (setup.ts)
+    if (this.cli.status !== 'ready') return Promise.resolve();
     for (const part of parts) this.pending.add(part);
     if (this.reading) return this.reading;
     this.reading = this.readUntilCurrent();

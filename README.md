@@ -1,4 +1,4 @@
-# Eidos for VS Code
+# Eidos MD for VS Code
 
 The developer's workflow with [Eidos](https://eidosmd.com) without leaving the editor: the specs and tasks that
 say what to build in a sidebar, edited in VS Code's own markdown editor with a Properties panel beside them, a
@@ -12,6 +12,9 @@ it stands where any outside tool could: every read is a command of the `eidos` C
 write is the command a person would run, so a project changed from VS Code is the same as one changed in Eidos
 MD or from the shell. Authoring the Core (new blueprints, moving them, the framework) stays in Eidos MD and the
 CLI.
+
+It needs the `eidos` CLI, 0.22 or later, and offers to install it when there is none (see
+[Which eidos it runs](#which-eidos-it-runs)).
 
 ## What it adds
 
@@ -52,38 +55,48 @@ The pictures show Reelhouse, a made-up streaming product.
 
 ## Which eidos it runs
 
-Each platform's VSIX carries its own `eidos` binary, the version `package.json` names under `eidos.version`, and
-runs it for every project whatever version the project pins, so nothing needs to be installed. The setting
-**Eidos: Path** (`eidos.path`) points it at another `eidos`, a newer build or one being developed. One older than
-the carried version is not used, and when a command's `--json` from it does not read as the extension expects,
-that command runs on the carried one instead; each is said once.
+The extension runs the `eidos` CLI you installed, 0.22 or later (the version `package.json` names under
+`eidos.minimum`). It looks for it on the PATH, then where the install script puts it (`~/.local/bin`, or
+`%LOCALAPPDATA%\Programs\eidos` on Windows). When there is none, the Eidos sidebar offers **Install the Eidos
+CLI**, which runs the CLI's own install command in a terminal:
+
+```bash
+curl -fsSL https://eidosmd.com/install | sh
+```
+
+On Windows it runs `irm https://eidosmd.com/install.ps1 | iex`. When the one installed is older than the
+extension reads, it offers **Update eidos**, which runs `eidos version update`. The setting **Eidos: Path**
+(`eidos.path`) points it at an `eidos` installed elsewhere, or one being developed.
+
+In a project, `eidos` runs as the version the project pins (`eidos version pin`), as it does in a terminal, so
+VS Code, the shell, CI, and agents all write with one version. A project pinning a version older than the
+extension reads runs as the installed `eidos` instead, and the extension says so once.
 
 ## Develop
 
 ```bash
 pnpm install
-pnpm fetch-eidos        # the eidos binary for this machine, into bin/
 pnpm build
 pnpm check              # TypeScript
 pnpm test               # unit tests
 pnpm test:host test/host/project   # the Extension Development Host checks, on a copy of the project (any Eidos project works)
-pnpm package [target]   # a VSIX for a platform (darwin-arm64, linux-x64, win32-x64, …, or all)
+pnpm package            # the VSIX, one for every platform
 node scripts/screenshots/run.mjs <project>  # the poses the README's pictures show, for capturing them again
 ```
 
-Without `bin/eidos`, a development build runs the `eidos` on the PATH. Press F5 with the repository open to run it
-in an Extension Development Host.
+The tests and a development build run the `eidos` you installed. Press F5 with the repository open to run it in
+an Extension Development Host.
 
 What the CLI does not publish yet, and how the extension stands in for it, is in [docs/gaps.md](docs/gaps.md).
 
 ## Release
 
 A release is a version tag. Set `version` in `package.json`, add its entry to `CHANGELOG.md` (the release notes
-are read from it), commit, and push `v<version>`: the Release workflow tests, packages the seven VSIX files,
-attaches them to the tag's GitHub release, and publishes them to Open VSX by trusted publishing. Run by hand from
+are read from it), commit, and push `v<version>`: the Release workflow tests, packages the VSIX, attaches it to
+the tag's GitHub release, and publishes it to Open VSX by trusted publishing. Run by hand from
 Actions, it only tests and packages.
 
 ## License
 
-The extension's code is MIT (see [LICENSE](LICENSE)). The `eidos` binary a VSIX carries keeps the CLI's own
-license, PolyForm Strict 1.0.0 with a permission for any commercial purpose; see [NOTICE](NOTICE).
+The extension is MIT (see [LICENSE](LICENSE)). It carries no part of the `eidos` CLI, which you install on its
+own under its own license.

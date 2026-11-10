@@ -1,11 +1,11 @@
 // The Eidos extension: turns on in a workspace holding an Eidos project
-// (REQ1), finds the eidos it runs (REQ14, REQ21), and registers the views,
-// the board, the editor features, and the commands, all on the CLI's --json.
+// (REQ1), finds the installed eidos it runs (REQ14, REQ21), offering to install
+// or update it, and registers the views, the board, the editor features, and
+// the commands, all on the CLI's --json.
 import * as vscode from 'vscode';
-import { existsSync } from 'node:fs';
-import { askVersion, EidosCli } from './core/cli.ts';
-import type { Binary } from './core/cli.ts';
+import { EidosCli } from './core/cli.ts';
 import { Notices } from './vscode/notices.ts';
+import { registerSetup } from './vscode/setup.ts';
 import { Projects } from './vscode/projects.ts';
 import { BacklogTree, CoreTree } from './vscode/trees.ts';
 import { PropertiesView } from './vscode/propertiesView.ts';
@@ -21,12 +21,11 @@ export async function activate(context: vscode.ExtensionContext): Promise<{ proj
   const notices = new Notices();
   context.subscriptions.push(notices);
 
-  const bundled = await carriedBinary(context, notices);
-  const cli = new EidosCli(notices, bundled);
-  await cli.configure(vscode.workspace.getConfiguration('eidos').get<string>('path', ''));
-
+  const cli = new EidosCli(notices, readMinimumVersion(context.extension.packageJSON));
   const projects = new Projects(cli, notices);
   context.subscriptions.push(projects);
+  const setup = registerSetup(cli, projects, notices);
+  context.subscriptions.push(setup);
 
   const core = new CoreTree(projects);
   const backlog = new BacklogTree(projects);
@@ -58,41 +57,25 @@ export async function activate(context: vscode.ExtensionContext): Promise<{ proj
     vscode.workspace.onDidChangeWorkspaceFolders(() => void rediscover()),
     vscode.workspace.onDidChangeConfiguration(async (event) => {
       if (!event.affectsConfiguration('eidos.path')) return;
-      await cli.configure(vscode.workspace.getConfiguration('eidos').get<string>('path', ''));
-      await Promise.all(projects.all.map((project) => project.read()));
+      await setup.locate();
     }),
   );
 
   await projects.discover();
-  await Promise.all(projects.all.map((project) => project.read()));
-  notices.log(`ready in ${Date.now() - started} ms: ${projects.all.map((project) => project.root).join(', ') || 'no Eidos project'} on eidos ${cli.active?.version ?? 'none'} (${cli.active?.source ?? '-'})`);
-  for (const project of projects.all) project.scheduleCheck(0);
+  // finds the eidos, then reads every project once one is ready
+  await setup.locate();
+  notices.log(`ready in ${Date.now() - started} ms: ${projects.all.map((project) => project.root).join(', ') || 'no Eidos project'} on eidos ${cli.binary?.version ?? cli.status} (${cli.binary?.path ?? '-'})`);
   if (context.extensionMode === vscode.ExtensionMode.Test) return { projects };
   return undefined;
 }
 
-// The eidos this VSIX carries, at the version package.json names; a development build without one runs the eidos on the PATH
-async function carriedBinary(context: vscode.ExtensionContext, notices: Notices): Promise<Binary | null> {
-  const name = process.platform === 'win32' ? 'eidos.exe' : 'eidos';
-  const file = vscode.Uri.joinPath(context.extensionUri, 'bin', name).fsPath;
-  const packageJson: unknown = context.extension.packageJSON;
-  const declared = readDeclaredVersion(packageJson);
-  if (existsSync(file) && declared) return { path: file, version: declared, source: 'bundled' };
-
-  const onPath = await askVersion(name, 'path');
-  if (onPath) {
-    notices.log(`this build carries no eidos; running the one on the PATH (${onPath.version})`);
-    return onPath;
+// The oldest eidos this release reads, the one package.json names (eidos.minimum)
+function readMinimumVersion(packageJson: unknown): string {
+  if (typeof packageJson === 'object' && packageJson !== null && 'eidos' in packageJson) {
+    const eidos = packageJson.eidos;
+    if (typeof eidos === 'object' && eidos !== null && 'minimum' in eidos && typeof eidos.minimum === 'string') return eidos.minimum;
   }
-  notices.notifyOnce('no-eidos', 'Eidos: this build of the extension carries no eidos for this platform and none is on the PATH. Set eidos.path to an eidos.', 'error');
-  return null;
-}
-
-function readDeclaredVersion(packageJson: unknown): string | null {
-  if (typeof packageJson !== 'object' || packageJson === null || !('eidos' in packageJson)) return null;
-  const eidos = packageJson.eidos;
-  if (typeof eidos !== 'object' || eidos === null || !('version' in eidos)) return null;
-  return typeof eidos.version === 'string' ? eidos.version : null;
+  throw new Error('package.json names no eidos.minimum');
 }
 
 export function deactivate(): void {}
