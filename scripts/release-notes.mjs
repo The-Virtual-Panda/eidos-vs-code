@@ -17,7 +17,7 @@ const minimum = eidos.minimum.replace(/\.0$/, '');
 
 console.log(`${body}
 
-**Install:** search for **Eidos MD** in the extensions view of Cursor, Windsurf, or VSCodium ([Open VSX](https://open-vsx.org/extension/the-virtual-panda/eidos)). To install by hand, in VS Code or any of them, download \`${file}\` below and run **Extensions: Install from VSIX…**, or:
+**Install:** search for **Eidos MD Specs and Backlog** in the extensions view of Cursor, Windsurf, or VSCodium ([Open VSX](https://open-vsx.org/extension/the-virtual-panda/eidos)). To install by hand, in VS Code or any of them, download \`${file}\` below and run **Extensions: Install from VSIX…**, or:
 
 \`\`\`bash
 code --install-extension ${file}

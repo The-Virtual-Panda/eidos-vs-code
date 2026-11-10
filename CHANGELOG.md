@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1
+
+- The listing's name is Eidos MD Specs and Backlog.
+
 ## 0.2.0
 
 The extension now runs the `eidos` you installed instead of carrying its own, so it is one small package for every platform.

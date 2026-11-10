@@ -1,4 +1,4 @@
-# Eidos MD for VS Code
+# Eidos MD Specs and Backlog
 
 The developer's workflow with [Eidos](https://eidosmd.com) without leaving the editor: the specs and tasks that
 say what to build in a sidebar, edited in VS Code's own markdown editor with a Properties panel beside them, a
