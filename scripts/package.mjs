@@ -14,7 +14,7 @@ const { version } = JSON.parse(readFileSync('package.json', 'utf8'));
 execFileSync('node', ['scripts/build.mjs'], { stdio: 'inherit' });
 for (const target of targets) {
   await fetchEidos(target);
-  const out = `eidos-vs-code-${target}-${version}.vsix`;
+  const out = `eidos-${target}-${version}.vsix`;
   execFileSync('pnpm', ['exec', 'vsce', 'package', '--no-dependencies', '--target', target, '--out', out], { stdio: 'inherit' });
   console.log(`✓ ${out}`);
 }

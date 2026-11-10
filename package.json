@@ -1,5 +1,5 @@
 {
-  "name": "eidos-vs-code",
+  "name": "eidos",
   "displayName": "Eidos",
   "description": "The developer's workflow with Eidos in VS Code: specs and tasks in a sidebar, a Properties panel for their frontmatter, a board, check findings in Problems, and ids that hover and open.",
   "version": "0.1.0",

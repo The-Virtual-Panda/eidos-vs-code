@@ -33,7 +33,7 @@ function firstTaskWithOpenLine(index) {
 }
 
 exports.run = async function run() {
-  const extension = vscode.extensions.all.find((candidate) => candidate.packageJSON.name === 'eidos-vs-code');
+  const extension = vscode.extensions.all.find((candidate) => candidate.packageJSON.name === 'eidos');
   assert.ok(extension, 'the extension is installed in the host');
   const activated = Date.now();
   const api = await extension.activate();
