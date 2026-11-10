@@ -5,6 +5,11 @@
   "version": "0.1.0",
   "publisher": "the-virtual-panda",
   "license": "SEE LICENSE IN LICENSE",
+  "icon": "media/icon.png",
+  "homepage": "https://eidosmd.com",
+  "bugs": {
+    "url": "https://github.com/The-Virtual-Panda/eidos-vs-code/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/The-Virtual-Panda/eidos-vs-code.git"
