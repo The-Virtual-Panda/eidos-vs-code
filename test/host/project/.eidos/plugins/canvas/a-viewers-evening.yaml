@@ -1,0 +1,48 @@
+title: A viewer's evening
+pages:
+  - id: evening
+    title: From sign-in to the credits
+    frames:
+      - { id: getting-in, title: Getting in, x: 472, y: 400, w: 548, h: 498, color: sand }
+      - { id: finding, title: Finding a film, x: 1071, y: 400, w: 279, h: 498, color: sky }
+      - { id: watching, title: Watching, x: 1391, y: 400, w: 549, h: 498, color: lilac }
+    nodes:
+      - { id: sign-in, blueprint: B-V06, frame: getting-in }
+      - { id: subscriptions, blueprint: B-S28, frame: getting-in }
+      - { id: profiles, blueprint: B-C81, frame: getting-in }
+      - { id: commuters, sticky: { text: "Commuters: download on Wi-Fi at home, watch underground.", color: blue }, frame: getting-in }
+      - { id: search, blueprint: B-N43, frame: finding }
+      - { id: watchlist, blueprint: B-W17, frame: finding }
+      - { id: collections, blueprint: B-M46, frame: finding }
+      - { id: resume, blueprint: B-V63, frame: watching }
+      - { id: subtitles, blueprint: B-D62, frame: watching }
+      - { id: downloads, blueprint: B-B31, frame: watching }
+      - id: continue
+        frame: watching
+        sketch: { label: Continue watching row, note: "The films a profile has started, on the home screen, newest first." }
+      - { id: credits, sticky: { text: "Past the credits marker = finished. Priya to check with two editors.", color: yellow }, frame: watching }
+    edges:
+      - { from: sign-in, to: profiles, label: picks a profile, from_anchor: right, to_anchor: left }
+      - { from: subscriptions, to: profiles, from_anchor: right, to_anchor: left }
+      - { from: profiles, to: search, from_anchor: right, to_anchor: left }
+      - { from: profiles, to: watchlist, from_anchor: right, to_anchor: left }
+      - { from: profiles, to: collections, from_anchor: right, to_anchor: left }
+      - { from: search, to: resume, label: plays, from_anchor: right, to_anchor: left }
+      - { from: watchlist, to: resume, label: plays, from_anchor: right, to_anchor: left }
+      - { from: collections, to: resume, from_anchor: right, to_anchor: left }
+      - { from: watchlist, to: downloads, label: saves for later, from_anchor: right, to_anchor: left }
+      - { from: resume, to: subtitles, from_anchor: right, to_anchor: left }
+      - { from: resume, to: continue, label: feeds, from_anchor: right, to_anchor: left }
+    layout:
+      sign-in: { x: 503, y: 460 }
+      subscriptions: { x: 503, y: 600 }
+      profiles: { x: 773, y: 530 }
+      commuters: { x: 773, y: 730 }
+      search: { x: 1103, y: 460 }
+      watchlist: { x: 1103, y: 600 }
+      collections: { x: 1103, y: 740 }
+      resume: { x: 1423, y: 460 }
+      subtitles: { x: 1693, y: 460 }
+      downloads: { x: 1423, y: 600 }
+      continue: { x: 1693, y: 600 }
+      credits: { x: 1423, y: 730 }

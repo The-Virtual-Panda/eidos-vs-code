@@ -1,0 +1,181 @@
+# The framework document: the structure this project is written in. See EIDOS.md for what each key means;
+# the `eidos` CLI edits this file. Every path is relative to this folder.
+
+eidos_version: 5.13.0
+
+# kebab-case | TitleCase | Title Case. Settled at install; changing it later means renaming files.
+naming: kebab-case
+
+# Every file at the top of the project, one entry each.
+top_level:
+  - title: README
+    path: ../README.md
+    description: "the project's front door: what this is, and pointers in."
+
+# Every folder at the top of the project, one entry each. `owned_by` names what governs it: "@eidos/collections" for
+# blueprints, "@<tool>/<kind>" for a tool's own folder. Absent, the folder is yours and nothing reads it.
+folders:
+  # The framing docs: what every other blueprint is judged against. One left unwritten is a gap to surface,
+  # not a failure.
+  - name: frames
+    title: frames
+    owned_by: "@eidos/collections"
+    description: "What every other blueprint is judged against: the product's architecture, audience, criteria, and market."
+    variants:
+      - { name: architecture, template: templates/frame.architecture.md, description: "the product as a built system", default: true }
+      - { name: audience, template: templates/frame.audience.md, description: "who it serves, and how each kind differs" }
+      - { name: criteria, template: templates/frame.criteria.md, description: "budget, scope objectives, timeline" }
+      - { name: market, template: templates/frame.market.md, description: "landscape, positioning, and how it earns" }
+  - name: specs
+    title: specs
+    owned_by: "@eidos/collections"
+    description: "The product's units, one per blueprint, grouped by domain."
+    variants:
+      - { name: full, template: templates/spec.full.md, description: "the complete spec template", default: true }
+      - { name: micro, template: templates/spec.micro.md, description: "Intent, Open Questions, Requirements, Out of Scope; grow into full" }
+    label: Domains
+    folder_property: domain
+    folders:
+      - name: playback
+      - name: identity
+      - name: discovery
+      - name: billing
+      # one entry per domain as they accrue, if you want to describe one: a name, a description, optionally a default_variant, and folders of its own
+  - name: assets
+    title: Assets
+    owned_by: "@assets/files"
+    description: "Images, diagrams, and documents the blueprints link to."
+  - name: backlog
+    owned_by: "@backlog/tasks"
+    description: the tasks that serve the blueprints, one markdown file each, the Backlog plugin's
+
+# The property contract, one block per owner. A property applies to `all` collections or a list; a required
+# one is generated into every new blueprint and surfaced when missing; `options` closes the value to a set.
+properties:
+  # The standard's. migrate rewrites this block; don't hand-edit it.
+  core:
+    - { name: id, type: Text, required: true, meaning: "Stable, unique identity, in any form. Assigned once, never changed." }
+    - { name: title, type: Text, required: true, meaning: "Human-readable name." }
+    - { name: summary, type: Text, meaning: "One line: what this blueprint is. Feeds the index; absent, the index flags it." }
+    - { name: variant, type: Text, meaning: "Which variant this blueprint follows. Absent = the nearest default on its folder's path, else the collection's." }
+  # Yours. The seed ships defaults; keep, scope, or drop any of them.
+  # `eidosmd: { new: today }` is the eidos CLI's key, which the standard reads past: `eidos new` fills the date as it scaffolds a blueprint.
+  custom:
+    - name: status
+      type: Text
+      applies_to: all
+      options: [ Draft, Intake, In Progress, Done, Archived, Deprecated ]
+      meaning: "Lifecycle stage."
+      canvas:
+        show: true
+        styles:
+          Draft:
+            color: "#8b9099"
+          Intake:
+            color: "#d3a53c"
+          In Progress:
+            color: "#5f80cf"
+          Done:
+            color: "#7fae6c"
+          Archived:
+            color: "#8b9099"
+          Deprecated:
+            color: "#cf7b8f"
+    - { name: date_created, type: Date, applies_to: all, meaning: "YYYY-MM-DD. Set once.", eidosmd: { new: today } }
+    - { name: date_modified, type: Date, applies_to: all, meaning: "YYYY-MM-DD. The last change.", eidosmd: { new: today } }
+    - { name: tags, type: List, applies_to: all, meaning: "Free tags." }
+    - { name: domain, type: Text, applies_to: [ specs ], meaning: "The folder: the path of the blueprint's folder in the collection, such as a/b. A value that is not its folder warns." }
+    - { name: depends_on, type: List, applies_to: [ specs ], meaning: "Blueprints this one needs, each a markdown link." }
+    - name: type
+      type: Text
+      applies_to: [ specs ]
+      meaning: "Soft label: drives views and filtering, never structure. e.g. feature, capability, integration."
+      canvas:
+        show: true
+        styles:
+          page:
+            shape: pill
+          feature:
+            shape: box
+          capability:
+            shape: box
+          integration:
+            shape: box
+          background:
+            shape: box
+          module:
+            shape: box
+          decision:
+            shape: parallelogram
+          note:
+            shape: box
+
+# The project's own terms: term, means, not (the near-misses and why), and see (the blueprint that defines it).
+# Starts empty; Eidos declares none.
+vocabulary: []
+
+# Generated by `eidos index`; never hand-edited. One list per collection, in the order the markdown index would use.
+index:
+  frames:
+    - id: architecture
+      title: Architecture
+      summary: The apps, the API that holds every position and watchlist, and the licence service between them.
+      path: architecture.md
+    - id: audience
+      title: Audience
+      summary: Households who watch films together and apart, on the TV at night and on phones on the way to work.
+      path: audience.md
+    - id: criteria
+      title: Criteria
+      summary: Launch Resume Playback and Watchlist sync before the winter season, inside the current team.
+      path: criteria.md
+    - id: market
+      title: Market
+      summary: A catalogue streaming service for people who care about films, priced below the big services.
+      path: market.md
+  specs:
+    - id: B-S28
+      title: Subscriptions
+      summary: Monthly or yearly plans, a free week to start, and cancellation in two taps.
+      path: billing/subscriptions.md
+      folder: billing
+    - id: B-M46
+      title: Curated Collections
+      summary: Editors group films into collections with a short note on why each film belongs.
+      path: discovery/curated-collections.md
+      folder: discovery
+    - id: B-N43
+      title: Search
+      summary: Finds a film by title, director, or cast as the viewer types, in under a second.
+      path: discovery/search.md
+      folder: discovery
+    - id: B-W17
+      title: Watchlist
+      summary: A viewer saves a film for later and finds it on every device, in the order they saved it.
+      path: discovery/watchlist.md
+      folder: discovery
+    - id: B-C81
+      title: Profiles
+      summary: Up to five people share an account, each with their own history, watchlist, and progress.
+      path: identity/profiles.md
+      folder: identity
+    - id: B-V06
+      title: Sign In
+      summary: One account across TV, phone, and web, signed in with an email link or a code on the TV.
+      path: identity/sign-in.md
+      folder: identity
+    - id: B-B31
+      title: Offline Downloads
+      summary: Lets a viewer save a film to a phone and watch it with no connection, for as long as the licence allows.
+      path: playback/offline-downloads.md
+      folder: playback
+    - id: B-V63
+      title: Resume Playback
+      summary: Returns a viewer to the exact second they stopped, on any device.
+      path: playback/resume-playback.md
+      folder: playback
+    - id: B-D62
+      title: Subtitles and Audio
+      summary: Every film plays with the subtitles and audio the viewer chose last, in their language when it exists.
+      path: playback/subtitles-and-audio.md
+      folder: playback

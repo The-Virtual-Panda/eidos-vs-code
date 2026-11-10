@@ -1,0 +1,74 @@
+# Backlog (backlog) settings shared by everyone in this project. Edit here, or on the Plugins page.
+statuses:
+  - To Do
+  - In Progress
+  - In Review
+  - Done
+columns:
+  - name: To Do
+    statuses:
+      - To Do
+  - name: In Progress
+    statuses:
+      - In Progress
+  - name: In Review
+    statuses:
+      - In Review
+  - name: Done
+    statuses:
+      - Done
+default_status: To Do
+status_colors: {}
+status_categories:
+  To Do: todo
+  In Progress: in_progress
+  In Review: in_progress
+  Done: done
+priorities:
+  - High
+  - Medium
+  - Low
+priority_icons: {}
+priority_colors: {}
+column_cards: 7
+forms_section: true
+milestones: []
+properties: []
+builtin_properties: []
+sections:
+  - title: Description
+    type: text
+    meaning: what the work is and why, read first
+  - title: Acceptance Criteria
+    type: checklist
+    meaning: what must be true when it is done, one line each, ticked as each is met
+types:
+  - name: default
+    title: Task
+    icon: box
+    color: gray
+  - name: bug
+    title: Bug
+    icon: bug
+    color: red
+  - name: design
+    title: Design
+    icon: spark
+    color: purple
+link_types:
+  - name: blocks
+    outward: blocks
+    inward: is blocked by
+  - name: relates
+    outward: relates to
+    inward: relates to
+  - name: duplicates
+    outward: duplicates
+    inward: is duplicated by
+  - name: clones
+    outward: clones
+    inward: is cloned by
+boards: []
+sprints: false
+setup_offered: false
+milestone_properties: []

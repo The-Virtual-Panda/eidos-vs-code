@@ -66,7 +66,7 @@ pnpm fetch-eidos        # the eidos binary for this machine, into bin/
 pnpm build
 pnpm check              # TypeScript
 pnpm test               # unit tests
-pnpm test:host <path to an Eidos project>   # the Extension Development Host checks, on a copy of the project
+pnpm test:host test/host/project   # the Extension Development Host checks, on a copy of the project (any Eidos project works)
 pnpm package [target]   # a VSIX for a platform (darwin-arm64, linux-x64, win32-x64, …, or all)
 node scripts/screenshots/run.mjs <project>  # the poses the README's pictures show, for capturing them again
 ```
@@ -75,6 +75,13 @@ Without `bin/eidos`, a development build runs the `eidos` on the PATH. Press F5 
 in an Extension Development Host.
 
 What the CLI does not publish yet, and how the extension stands in for it, is in [docs/gaps.md](docs/gaps.md).
+
+## Release
+
+A release is a version tag. Set `version` in `package.json`, add its entry to `CHANGELOG.md` (the release notes
+are read from it), commit, and push `v<version>`: the Release workflow tests, packages the seven VSIX files,
+attaches them to the tag's GitHub release, and publishes them to Open VSX by trusted publishing. Run by hand from
+Actions, it only tests and packages.
 
 ## License
 

@@ -1,0 +1,147 @@
+# A release is a version tag. Pushing v<version> (the version package.json names) tests the extension, packages
+# the seven platform VSIX files, attaches them to the tag's GitHub release, and publishes them to Open VSX and,
+# once the publisher is accepted there, to the VS Code Marketplace.
+#
+# Open VSX takes the workflow's own OIDC identity (trusted publishing), so it needs no stored token: the
+# the-virtual-panda namespace registers this repository, this file, and the open-vsx environment. The
+# Marketplace has no such identity yet, so its token is the VSCE_PAT secret of the marketplace environment,
+# and its job runs only while the repository variable PUBLISH_TO_MARKETPLACE is true.
+#
+# Each publish skips a version already there, so a failed job can be run again on its own. Run by hand (Actions,
+# Release, Run workflow), it only tests and packages, on any branch: nothing is released or published.
+name: Release
+
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  PNPM_VERSION: 11.17.0
+  NODE_VERSION: 22
+
+jobs:
+  build:
+    name: Test and package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+
+      - name: The tag is package.json's version
+        if: github.event_name == 'push'
+        run: |
+          version="$(node -p "require('./package.json').version")"
+          if [ "$GITHUB_REF_NAME" != "v$version" ]; then
+            echo "::error::the tag $GITHUB_REF_NAME does not match package.json's version $version; tag v$version, or set the version first"
+            exit 1
+          fi
+
+      - name: Release notes from CHANGELOG.md
+        run: node scripts/release-notes.mjs > release-notes.md
+
+      - run: pnpm check
+      - run: pnpm test
+
+      - name: Extension Development Host checks
+        run: |
+          pnpm fetch-eidos linux-x64
+          xvfb-run -a pnpm test:host test/host/project
+
+      - name: Package every platform
+        run: pnpm package all
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release
+          path: |
+            eidos-*.vsix
+            release-notes.md
+          if-no-files-found: error
+
+  github-release:
+    name: GitHub release
+    needs: build
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: release
+      - name: Attach the packages to the tag's release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" > /dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" eidos-*.vsix --clobber --repo "$GITHUB_REPOSITORY"
+          else
+            gh release create "$GITHUB_REF_NAME" eidos-*.vsix --repo "$GITHUB_REPOSITORY" --verify-tag \
+              --title "Eidos for VS Code ${GITHUB_REF_NAME#v}" --notes-file release-notes.md
+          fi
+
+  open-vsx:
+    name: Open VSX
+    needs: build
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: open-vsx
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v8
+        with:
+          name: release
+          path: release
+      - name: Publish by trusted publishing
+        run: pnpm exec ovsx publish --trusted-publishing --skip-duplicate --packagePath release/eidos-*.vsix
+
+  marketplace:
+    name: VS Code Marketplace
+    needs: build
+    if: github.event_name == 'push' && vars.PUBLISH_TO_MARKETPLACE == 'true'
+    runs-on: ubuntu-latest
+    environment: marketplace
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v8
+        with:
+          name: release
+          path: release
+      - name: Publish
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: pnpm exec vsce publish --skip-duplicate --packagePath release/eidos-*.vsix

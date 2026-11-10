@@ -1,0 +1,18 @@
+# A comments thread, kept by the Comments plugin (eidos comments); its target is a permanent id, its anchor the host's own keys.
+id: t-h2tv6b
+target:
+  host: backlog
+  id: T-D04
+resolved: false
+messages:
+  - author: Maya Okafor
+    role: project-manager
+    user: maya
+    at: 2026-11-10T04:07:02.639Z
+    text: |-
+      How long does the TV hold it? If a viewer switches to the phone first, the phone's position should win.
+  - author: Claude
+    user: claude
+    at: 2026-11-10T04:09:02.639Z
+    text: |-
+      Until it reconnects, and only if it is newer than the position the API already has. The API compares the two times and keeps the later one, so the phone wins.

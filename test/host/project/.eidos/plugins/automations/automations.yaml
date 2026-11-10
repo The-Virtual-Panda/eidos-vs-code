@@ -1,0 +1,35 @@
+automations:
+  - name: Review new specs
+    when:
+      on: blueprint-added
+      collection: specs
+    ask: first
+    steps:
+      - do: agent:review
+        answer: comment
+      - if: Did the review find any gaps?
+      - ask: Open a task to close the gaps in {subject}?
+        yes: Open a task
+        no: Leave it
+      - do: backlog.add
+        title: Close the gaps in {subject}
+  - name: Ship finished work
+    when:
+      on: task-status
+      status: Done
+    ask: never
+    steps:
+      - do: git.commit
+        message: Finish {subject}
+        what: everything
+      - ask: Publish the commit for the team?
+        yes: Publish
+        no: Not now
+      - do: git.push
+  - name: Weekly release notes
+    when:
+      on: by-name
+    ask: never
+    steps:
+      - do: agent:release-notes
+        answer: conversation

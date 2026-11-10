@@ -1,0 +1,15 @@
+# AI Agent (agent) settings shared by everyone in this project. Edit here, or on the Plugins page.
+commands:
+  - name: review
+    prompt: "Review $ARGUMENTS (or the open blueprint) for gaps: missing Out of
+      Scope, untestable criteria, open questions nobody owns. List them; change
+      nothing."
+    description: Review a blueprint for gaps before it goes to the team
+  - name: release-notes
+    prompt: Draft release notes from the tasks moved to Done this week, one line
+      each, grouped by the blueprint they serve.
+    description: Draft release notes from the tasks done this week
+  - name: handoff
+    prompt: "Summarize $ARGUMENTS (or the open blueprint) for whoever picks it up
+      next: what is settled, what is open, and the tasks in flight."
+    description: Summarize a blueprint for whoever picks it up next

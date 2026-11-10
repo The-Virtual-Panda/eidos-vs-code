@@ -1,0 +1,77 @@
+# eidosmd settings shared by everyone in this project. Edit by hand, with eidos setup, or from the Eidos MD app.
+# product: the product this project defines, by its name, as the app's Home and its tab show it (eidos setup --product); absent, the repository's folder.
+# plugins: which plugins are on for this project, plugins.<name>: true | false (eidos plugin lists them); one not named is at its default.
+# community_plugins: the plugins from outside the package this project uses, community_plugins.<name>: <version>, each installed once per machine under the app data folder and run only once you allow it (eidos plugin allow <name>).
+# users: the people who work here: { name, alias (for @mentions, no spaces), role (from .eidos/roles/), email (ties to git), agent (true for an AI agent that comments as itself), editor (true for a framework editor, who may change the framework; with none marked, everyone is one), owner (true for a framework owner, always an editor, and the only one who grants or removes owner), plugin (the plugin whose user this is, which keeps its name, alias, and role and says whether it may change the framework) } (eidos users lists them, eidos users add adds one, eidos users set sets the access).
+# on_save: where the on-save rules were kept before they became the Linter's ({ property, set: today | now }); the Linter applies them until .eidos/plugins/linter/settings.yaml has its own, and the line goes once they have moved.
+# versions.tag_prefix: what a recorded version's git tag starts with (eidos git version record --tag), blueprints/ by default.
+# check.strict: whether a warning fails eidos check as an error does; the owners' decision for this project (eidos check --strict / --no-strict override one run).
+# check.require_template: whether a blueprint must follow a template, so one with no variant and no default is a warning (variant-missing) and eidos new refuses to make one; false by default, since a template is offered, never owed.
+# check.warn_missing_summaries: whether a blueprint with content but no summary is a warning (summary-missing), a blueprint still as its template left it never being one; true by default.
+# check.warn_unknown_sections: whether a heading the variant's template does not declare is a warning (section-unknown); false by default, since a template is a starting point, not a fence.
+# check.warn_missing_sections: whether a section the template marks required but the body lacks is a warning (section-missing; every section, where the template marks none); true by default.
+# check.warn_missing_optional_sections: whether a section the template declares but does not require, missing from the body, is a warning (section-optional-missing); false by default, since such a section is added when it is wanted.
+# check.warn_section_order: whether the template's headings out of its order are a warning (section-order), extra headings skipped; true by default.
+# check.warn_unknown_properties: whether a property the framework does not declare for the blueprint's collection is a warning (property-unknown, property-scope); true by default, so a property of a person's own is seen and promoted to the framework or dropped.
+# check.collections: a collection's own template rules, check.collections.<collection>.<rule> for require_template, warn_missing_sections, warn_section_order, warn_missing_optional_sections, and warn_unknown_sections, each winning over the project's line for that collection's blueprints; a rule not named follows the project's.
+# The check's rules are part of the framework: a framework editor's to change, from Framework settings → Rules in the Eidos MD app or with eidos setup.
+# installed: what eidos install brought in from a Registry package: { package, ref, pieces, date }, written by the command, read to say what came from where.
+# icons: what the app's tree and tabs draw on a folder or a blueprint, icons.folders.<path from the project> and icons.blueprints.<id>: { icon (lucide:<name> or an emoji), color (gray, red, orange, yellow, green, teal, blue, purple, or pink) } (eidos icons lists them, eidos icons set and unset change one; a folder's right-click Change icon… in the app does too).
+# ids.scheme: how a new blueprint, task, or record draws its id (eidos setup --id-scheme): random (four characters, B-1AC3; what a project without the line draws), adaptive (letters then digits, three characters growing as each length fills, T-F36; recommended), or sequential (an adaptive draft id on any branch, given the next number on the default branch by eidos ids finalize, T-412).
+# ids.padding: under sequential, the digits a number is padded to with zeros (3 gives T-001); 0 or absent, none.
+# ids.default_branch: the branch eidos ids finalize runs on and eidos ids fix-duplicates compares with; absent, the CI's default branch, else origin's HEAD, else main or master.
+# home.widgets: the project's Home, the widgets everyone starts from in their order, by key (a host widget by its name, check or collections; a plugin's as <plugin>:<name>), until they arrange their own; absent, an empty Home. A framework owner's to set (the Home's Add widget → Use as the project's Home).
+# home.overview: the top-level doc the Home's Overview tab reads, by its path (README.md); absent, the first under top_level. A framework editor's to set (the Overview's ⋯ → Use as the overview).
+# vocabulary: where the app lists the Vocabulary, core (among the top-level docs in the Project Core view; what a project without the line does) or settings (among the framework's pages in Framework settings). A framework owner's to set (the Vocabulary's Move to settings and Move to Core).
+product: Reelhouse
+plugins:
+  agent: true
+  automations: true
+  assets: true
+  comments: true
+  records: false
+  linter: true
+  canvas: true
+  backlog: true
+  git: true
+  metrics: false
+  terminal: false
+users:
+  - name: Maya Okafor
+    alias: maya
+    role: project-manager
+    email: maya@example.com
+  - name: Tomás Reyes
+    alias: tomas
+    role: developer
+    email: tomas@example.com
+  - name: Priya Nair
+    alias: priya
+    role: designer
+    email: priya@example.com
+  - name: Claude
+    alias: claude
+    role: null
+    email: null
+    agent: true
+versions:
+  tag_prefix: blueprints/
+check:
+  strict: false
+  require_template: false
+  warn_missing_summaries: true
+  warn_unknown_sections: false
+  warn_missing_sections: true
+  warn_missing_optional_sections: false
+  warn_section_order: true
+  warn_unknown_properties: true
+installed:
+  - package: "@BuildableWorks/software"
+    ref: v5.13.0
+    pieces:
+      - root
+    date: 2026-08-11
+ids:
+  scheme: adaptive
+  padding: 0
+  default_branch: null

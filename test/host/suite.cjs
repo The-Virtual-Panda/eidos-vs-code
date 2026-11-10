@@ -70,7 +70,8 @@ exports.run = async function run() {
   });
 
   const index = project.index;
-  const blueprint = index.snapshot.blueprints.find((candidate) => candidate.id === 'B-A45') ?? index.snapshot.blueprints[0];
+  // B-A45 in the eidosmd project, else the first blueprint whose id hovers (a frame's id may be a plain word)
+  const blueprint = index.snapshot.blueprints.find((candidate) => candidate.id === 'B-A45') ?? index.snapshot.blueprints.find((candidate) => /^B-[0-9A-Z]{3,12}$/.test(candidate.id));
   const task = firstTaskWithOpenLine(index);
 
   await check('REQ10: an id hovers with its title and opens at a requirement', async () => {
@@ -143,7 +144,16 @@ exports.run = async function run() {
     assert.match(fs.readFileSync(path.join(root, blueprint.path), 'utf8'), new RegExp(`^maturity: ${next}$`, 'm'));
   });
 
+  // a priority the task does not have yet, from the project's own list, so a write shows in the file
+  function anotherPriority() {
+    const listed = project.index.snapshot.backlog.settings.priorities;
+    const current = String(project.index.task(task.id).priority ?? '').toLowerCase();
+    return (listed.length > 0 ? listed : ['high', 'medium', 'low']).find((priority) => priority.toLowerCase() !== current);
+  }
+  const priorityLine = (priority) => new RegExp(`^priority: "?${priority}"?$`, 'im');
+
   await check('REQ17: a write never lands over unsaved edits: refused unless the developer saves first', async () => {
+    const priority = anotherPriority();
     const document = await vscode.workspace.openTextDocument(taskFile);
     const editor = await vscode.window.showTextDocument(document);
     await editor.edit((edit) => edit.insert(new vscode.Position(document.lineCount, 0), '\nAn unsaved line.\n'));
@@ -155,18 +165,18 @@ exports.run = async function run() {
         asked.push(message);
         return undefined;
       };
-      const refused = await project.write(['backlog', 'set', task.id, '--priority', 'high'], taskFile);
+      const refused = await project.write(['backlog', 'set', task.id, '--priority', priority], taskFile);
       assert.equal(refused, false, 'the write is refused while the edits are unsaved');
       assert.equal(document.isDirty, true);
-      assert.doesNotMatch(fs.readFileSync(taskFile, 'utf8'), /^priority: high$/m);
+      assert.doesNotMatch(fs.readFileSync(taskFile, 'utf8'), priorityLine(priority));
       vscode.window.showWarningMessage = async (message, _options, save) => {
         asked.push(message);
         return save;
       };
-      const written = await project.write(['backlog', 'set', task.id, '--priority', 'high'], taskFile);
+      const written = await project.write(['backlog', 'set', task.id, '--priority', priority], taskFile);
       assert.equal(written, true);
       const text = fs.readFileSync(taskFile, 'utf8');
-      assert.match(text, /^priority: high$/m);
+      assert.match(text, priorityLine(priority));
       assert.match(text, /An unsaved line\./, 'the saved edit is kept beside the write');
     } finally {
       vscode.window.showWarningMessage = ask;
@@ -176,8 +186,9 @@ exports.run = async function run() {
 
   await check('REQ12: a change made outside VS Code shows without a reload', async () => {
     const binary = path.join(extension.extensionPath, 'bin', 'eidos');
-    execFileSync(binary, ['--project', root, 'backlog', 'set', task.id, '--priority', 'low'], { env: { ...process.env, EIDOS_RUNS_AS: extension.packageJSON.eidos.version } });
-    await until('the index to see the new priority', () => project.index.task(task.id).priority === 'low');
+    const priority = anotherPriority();
+    execFileSync(binary, ['--project', root, 'backlog', 'set', task.id, '--priority', priority], { env: { ...process.env, EIDOS_RUNS_AS: extension.packageJSON.eidos.version } });
+    await until('the index to see the new priority', () => String(project.index.task(task.id).priority).toLowerCase() === priority.toLowerCase());
   });
 
   await check('REQ8: a new task made for a blueprint', async () => {

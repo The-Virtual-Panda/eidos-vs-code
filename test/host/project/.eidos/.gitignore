@@ -1,0 +1,12 @@
+# Eidos: me.md is local and never shared.
+# Each person who works on this definition keeps their own me.md (here in .eidos/); the agent reads
+# it to know who they are. It is the one file of the standard's own that is not checked in.
+me.md
+
+# Eidos: a tool's local.yaml and local/ stay on this machine and are never shared.
+# A tool that keeps a folder under plugins/ keeps one person's settings in local.yaml (a viewer
+# command, an editor, a key path) and one person's files in local/ (a cache, a scratch area);
+# nothing else in its folder is local. These two lines cover every tool, so no tool writes a
+# .gitignore of its own.
+plugins/*/local.yaml
+plugins/*/local/

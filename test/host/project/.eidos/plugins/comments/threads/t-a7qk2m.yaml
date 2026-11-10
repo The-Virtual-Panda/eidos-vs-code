@@ -1,0 +1,24 @@
+# A comments thread, kept by the Comments plugin (eidos comments); its target is a permanent id, its anchor the host's own keys.
+id: t-a7qk2m
+target:
+  host: blueprint
+  id: B-V63
+at:
+  section: Out of Scope
+resolved: false
+messages:
+  - author: Tomás Reyes
+    role: developer
+    user: tomas
+    at: 2026-11-10T02:05:02.638Z
+    reactions:
+      👍:
+        - maya
+    text: |-
+      Do we need to say anything about a film the viewer removed from their history? Right now it would still resume.
+  - author: Maya Okafor
+    role: project-manager
+    user: maya
+    at: 2026-11-10T02:10:02.638Z
+    text: |-
+      Good catch. Removed history stays removed; I added it to Out of Scope.

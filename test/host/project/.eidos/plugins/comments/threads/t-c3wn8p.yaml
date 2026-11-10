@@ -1,0 +1,39 @@
+# A comments thread, kept by the Comments plugin (eidos comments); its target is a permanent id, its anchor the host's own keys.
+id: t-c3wn8p
+target:
+  host: blueprint
+  id: B-V63
+at:
+  section: Functional
+  item: REQ3
+resolved: false
+messages:
+  - author: Tomás Reyes
+    role: developer
+    user: tomas
+    at: 2026-11-10T04:08:02.638Z
+    reactions:
+      👀:
+        - priya
+    text: |-
+      Does every film carry a credits marker, or only the ones ingested since the new pipeline?
+  - author: Claude
+    user: claude
+    at: 2026-11-10T04:09:02.639Z
+    reactions:
+      👍:
+        - maya
+        - tomas
+      🎯:
+        - priya
+    text: |-
+      Only films ingested since August carry one, about 60% of the catalogue. For the rest, T-R08 can treat the last five minutes as finished. Want me to add that as REQ5?
+  - author: Maya Okafor
+    role: project-manager
+    user: maya
+    at: 2026-11-10T04:10:02.639Z
+    reactions:
+      🙌:
+        - tomas
+    text: |-
+      Yes, add it. Five minutes is fine for now.

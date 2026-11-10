@@ -1,0 +1,15 @@
+# A comments thread, kept by the Comments plugin (eidos comments); its target is a permanent id, its anchor the host's own keys.
+id: t-f5rd1x
+target:
+  host: blueprint
+  id: B-V63
+at:
+  section: Open Questions
+resolved: false
+messages:
+  - author: Priya Nair
+    role: designer
+    user: priya
+    at: 2026-11-10T02:07:02.639Z
+    text: |-
+      In the last few minutes, I think the credits are the signal. If they are past the credits marker, they finished.
